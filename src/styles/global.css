@@ -16,6 +16,7 @@
 }
 
 html.dark {
+  color-scheme: dark;
   --bg-canvas: #0f1012;
   --bg-surface: #17181c;
   --bg-surface-elevated: #1e2025;
@@ -28,6 +29,11 @@ html.dark {
   --tactile-ink: #111111;
   --tactile-border: #111111;
   --tactile-shadow: 0 4px 0 #000000;
+}
+
+#audit-url {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
 }
 
 body {

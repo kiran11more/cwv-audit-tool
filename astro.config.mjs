@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import { loadEnv } from 'vite';
 
 /**
  * Dev-only Vite middleware that mounts `functions/api/audit.ts` at POST /api/audit during `astro dev`.
@@ -11,6 +12,7 @@ function devPagesAuditMiddleware() {
     name: 'dev-cloudflare-pages-audit',
     /** @param {import('vite').ViteDevServer} server */
     configureServer(server) {
+      const loadedEnv = loadEnv(server.config.mode, process.cwd(), '');
       server.middlewares.use('/api/audit', async (req, res, next) => {
         if (req.method !== 'POST' && req.method !== 'OPTIONS') {
           return next();
@@ -55,7 +57,10 @@ function devPagesAuditMiddleware() {
             body: rawBody,
           });
 
-          const response = await mod.onRequestPost({ request, env: process.env });
+          const response = await mod.onRequestPost({
+            request,
+            env: { ...process.env, ...loadedEnv },
+          });
           res.statusCode = response.status;
           response.headers.forEach((value, key) => res.setHeader(key, value));
           res.end(await response.text());
