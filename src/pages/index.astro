@@ -837,6 +837,29 @@ import '../styles/global.css';
           });
         });
 
+        async function fetchSingleStrategy(targetUrl, strat) {
+          const res = await fetch('/api/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: targetUrl, strategy: strat }),
+          });
+          const rawText = await res.text();
+          let data = null;
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            throw new Error(
+              res.status === 524 || res.status === 504 || rawText.trim().startsWith('<')
+                ? `Timed out scanning ${strat} (target site responded too slowly). Please try again.`
+                : `Unexpected server response (${res.status}) while scanning ${strat}.`,
+            );
+          }
+          if (!res.ok) {
+            throw new Error(data?.error || `Request failed (${res.status})`);
+          }
+          return data?.[strat] || data;
+        }
+
         form?.addEventListener('submit', async (e) => {
           e.preventDefault();
           const targetUrl = urlInput?.value?.trim();
@@ -844,17 +867,28 @@ import '../styles/global.css';
 
           setLoading(true);
           try {
-            const res = await fetch('/api/audit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url: targetUrl, strategy: 'both' }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-              throw new Error(data.error || `Request failed (${res.status})`);
+            const [mobileRes, desktopRes] = await Promise.allSettled([
+              fetchSingleStrategy(targetUrl, 'mobile'),
+              fetchSingleStrategy(targetUrl, 'desktop'),
+            ]);
+
+            const mobile = mobileRes.status === 'fulfilled' ? mobileRes.value : null;
+            const desktop = desktopRes.status === 'fulfilled' ? desktopRes.value : null;
+
+            if (!mobile && !desktop) {
+              const firstErr = mobileRes.status === 'rejected' ? mobileRes.reason : desktopRes.reason;
+              throw firstErr instanceof Error ? firstErr : new Error('Unable to complete audit.');
             }
-            fullPayload = data;
-            activeView = data.mobile ? 'mobile' : 'desktop';
+
+            const primary = mobile || desktop;
+            fullPayload = {
+              auditedUrl: primary.auditedUrl,
+              finalUrl: primary.finalUrl,
+              fetchTime: primary.fetchTime,
+              mobile,
+              desktop,
+            };
+            activeView = mobile ? 'mobile' : 'desktop';
             renderActiveView();
           } catch (err) {
             if (errorEl) {

@@ -17,7 +17,7 @@ interface AuditRequestBody {
 }
 
 const PSI_ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
-const REQUEST_TIMEOUT_MS = 35_000;
+const REQUEST_TIMEOUT_MS = 26_000;
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
