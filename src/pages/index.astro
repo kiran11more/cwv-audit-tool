@@ -37,9 +37,12 @@ import '../styles/global.css';
     <header class="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/90 backdrop-blur-md">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <a href="/cwv-audit" class="inline-flex items-center gap-2.5 font-extrabold tracking-tight text-base sm:text-lg">
-          <span class="w-8 h-8 rounded-[7px] bg-[#111111] border-[1.5px] border-[#FACC15] flex items-center justify-center text-[#FACC15] font-mono text-xs font-bold">
-            CWV
-          </span>
+          <svg class="w-8 h-8 shrink-0" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#111111" />
+            <rect x="4" y="4" width="56" height="56" rx="11" stroke="#FACC15" stroke-width="3.5" />
+            <path d="M18 42L27 24L35 35L46 18" stroke="#FACC15" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="46" cy="18" r="4.5" fill="#FACC15" />
+          </svg>
           <span>CWV Audit Tool</span>
         </a>
 
