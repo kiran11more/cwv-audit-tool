@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #faf8f4;
+  --bg-surface: #f2efe8;
+  --bg-surface-elevated: #ffffff;
+  --text-primary: #111111;
+  --text-secondary: #4a4a4f;
+  --text-muted: #71717a;
+  --border-subtle: #e4e1d8;
+  --border-strong: #111111;
+  --tactile-accent: #facc15;
+  --tactile-ink: #111111;
+  --tactile-border: #111111;
+  --tactile-shadow: 0 4px 0 #111111;
+}
+
+html.dark {
+  --bg-canvas: #0f1012;
+  --bg-surface: #17181c;
+  --bg-surface-elevated: #1e2025;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-subtle: #27272a;
+  --border-strong: #3f3f46;
+  --tactile-accent: #facc15;
+  --tactile-ink: #111111;
+  --tactile-border: #111111;
+  --tactile-shadow: 0 4px 0 #000000;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.card-tactile {
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 3px 0 var(--border-strong);
+}
+
+.btn-tactile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--tactile-accent);
+  color: var(--tactile-ink);
+  border: 1.5px solid var(--tactile-border);
+  border-radius: 8px;
+  font-weight: 700;
+  box-shadow: 0 3px 0 var(--tactile-border);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.btn-tactile:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 var(--tactile-border);
+}
+
+.btn-tactile:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--tactile-border);
+}
+
+.btn-tactile:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

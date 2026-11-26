@@ -1,0 +1,571 @@
+---
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core Web Vitals Audit Tool | Live Lighthouse &amp; CrUX Analyzer</title>
+    <meta
+      name="description"
+      content="Run a live Core Web Vitals and PageSpeed Insights audit on any public website. Inspect mobile and desktop LCP, INP, CLS, CrUX field data, and prioritized speed bottlenecks."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('cwv-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = stored ? stored === 'dark' : prefersDark;
+        document.documentElement.classList.toggle('dark', isDark);
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-screen flex flex-col antialiased">
+    <!-- Top Header -->
+    <header class="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/90 backdrop-blur-md">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <a href="/" class="inline-flex items-center gap-2.5 font-extrabold tracking-tight text-base sm:text-lg">
+          <span class="w-8 h-8 rounded-[7px] bg-[#111111] border-[1.5px] border-[#FACC15] flex items-center justify-center text-[#FACC15] font-mono text-xs font-bold">
+            CWV
+          </span>
+          <span>CWV Audit Tool</span>
+        </a>
+
+        <div class="flex items-center gap-3">
+          <a
+            href="https://kiranm.in/services/page-speed-optimization"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            <span>By Kiran M.</span>
+            <span aria-hidden="true">&nearr;</span>
+          </a>
+
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle color theme"
+            class="px-3 py-1.5 rounded-[7px] border border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-semibold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+          >
+            <span id="theme-label">Light Mode</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10">
+      <!-- Hero & Audit Form -->
+      <section class="space-y-6 max-w-4xl">
+        <div class="space-y-3">
+          <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[11px] font-mono font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+            <span class="w-2 h-2 rounded-full bg-[var(--tactile-accent)]"></span>
+            <span>// LIVE PAGESPEED INSIGHTS &amp; CRUX ANALYZER</span>
+          </p>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] leading-[1.1] text-[var(--text-primary)]">
+            Audit your Core Web Vitals in seconds.
+          </h1>
+          <p class="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
+            Run a live Google PageSpeed Insights v5 scan on any public URL. Inspect 28-day real-user CrUX field data, Lighthouse lab metrics, and prioritized bottlenecks.
+          </p>
+        </div>
+
+        <form id="audit-form" class="card-tactile p-4 sm:p-5 space-y-4">
+          <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex-1 relative">
+              <label for="audit-url" class="sr-only">Website URL</label>
+              <input
+                id="audit-url"
+                name="url"
+                type="text"
+                inputmode="url"
+                required
+                placeholder="https://example.com"
+                class="w-full h-12 px-4 rounded-[8px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-canvas)] text-sm sm:text-base font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--tactile-accent)]"
+              />
+            </div>
+
+            <!-- Mobile / Desktop Strategy Toggle -->
+            <div
+              role="group"
+              aria-label="Device strategy"
+              class="inline-flex p-1 rounded-[8px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface)] h-12 shrink-0"
+            >
+              <button
+                type="button"
+                data-strategy="mobile"
+                aria-pressed="true"
+                class="strategy-btn px-3.5 rounded-[6px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer"
+              >
+                Mobile
+              </button>
+              <button
+                type="button"
+                data-strategy="desktop"
+                aria-pressed="false"
+                class="strategy-btn px-3.5 rounded-[6px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+              >
+                Desktop
+              </button>
+            </div>
+
+            <button
+              id="run-audit-btn"
+              type="submit"
+              class="btn-tactile h-12 px-6 text-sm whitespace-nowrap shrink-0"
+            >
+              <span id="run-btn-text">Run Live Audit</span>
+              <span aria-hidden="true">&rarr;</span>
+            </button>
+          </div>
+
+          <!-- Quick Demo Presets -->
+          <div class="flex flex-wrap items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+            <span>Try:</span>
+            <button type="button" data-preset="https://kiranm.in" class="preset-btn px-2.5 py-1 rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer">
+              kiranm.in
+            </button>
+            <button type="button" data-preset="https://astro.build" class="preset-btn px-2.5 py-1 rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer">
+              astro.build
+            </button>
+            <button type="button" data-preset="https://wordpress.org" class="preset-btn px-2.5 py-1 rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer">
+              wordpress.org
+            </button>
+          </div>
+        </form>
+
+        <!-- Staged Loading State -->
+        <div id="audit-loading" class="hidden card-tactile p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-[var(--tactile-accent)] animate-ping"></span>
+            <p id="loading-stage" class="font-mono text-sm font-bold text-[var(--text-primary)]">
+              Connecting to Google PageSpeed Insights...
+            </p>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] overflow-hidden">
+            <div id="loading-bar" class="h-full bg-[var(--tactile-accent)] transition-all duration-700" style="width: 18%;"></div>
+          </div>
+          <p class="text-xs font-mono text-[var(--text-muted)]">
+            Live Lighthouse scans typically take 10&ndash;25 seconds depending on target server response.
+          </p>
+        </div>
+
+        <!-- Error State -->
+        <div id="audit-error" class="hidden card-tactile p-5 border-rose-500 bg-rose-500/10 text-sm text-rose-600 dark:text-rose-400 font-medium">
+        </div>
+      </section>
+
+      <!-- Results Dashboard -->
+      <section id="audit-results" class="hidden space-y-8">
+        <!-- Result Header & Export Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[var(--border-subtle)]">
+          <div class="space-y-1">
+            <p class="text-xs font-mono uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              Audit Report &middot; <span id="res-strategy" class="text-[var(--text-primary)] font-bold">MOBILE</span>
+            </p>
+            <h2 id="res-url" class="text-lg sm:text-xl font-extrabold font-mono text-[var(--text-primary)] break-all"></h2>
+            <p id="res-time" class="text-xs font-mono text-[var(--text-muted)]"></p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              id="copy-md-btn"
+              type="button"
+              class="px-3.5 py-2 rounded-[7px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+            >
+              Copy Markdown
+            </button>
+            <button
+              id="download-json-btn"
+              type="button"
+              class="px-3.5 py-2 rounded-[7px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+            >
+              Download JSON
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Lighthouse Category Scores -->
+        <div id="scores-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+        <!-- Field Data (CrUX) vs Lab Data (Lighthouse) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card-tactile p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
+              <div>
+                <h3 class="text-base font-extrabold text-[var(--text-primary)]">Real-User Field Data (CrUX)</h3>
+                <p class="text-xs text-[var(--text-muted)]">28-day Chrome UX Report (75th percentile)</p>
+              </div>
+              <span id="crux-badge" class="px-2.5 py-1 rounded-[5px] text-[11px] font-mono font-bold border"></span>
+            </div>
+            <div id="crux-metrics" class="space-y-3"></div>
+          </div>
+
+          <div class="card-tactile p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
+              <div>
+                <h3 class="text-base font-extrabold text-[var(--text-primary)]">Lighthouse Lab Diagnostics</h3>
+                <p class="text-xs text-[var(--text-muted)]">Controlled synthetic crawl measurements</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-[5px] text-[11px] font-mono font-bold border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
+                SIMULATED
+              </span>
+            </div>
+            <div id="lab-metrics" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- Top Actionable Opportunities -->
+        <div class="card-tactile p-5 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
+            <div>
+              <h3 class="text-base sm:text-lg font-extrabold text-[var(--text-primary)]">
+                Top Speed Bottlenecks &amp; Opportunities
+              </h3>
+              <p class="text-xs text-[var(--text-muted)]">
+                Prioritized by estimated load-time and payload savings
+              </p>
+            </div>
+          </div>
+          <div id="opportunities-list" class="divide-y divide-[var(--border-subtle)]"></div>
+        </div>
+
+        <!-- Contextual Fix CTA -->
+        <div class="card-tactile p-6 sm:p-8 bg-[var(--bg-surface)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-1.5 max-w-xl">
+            <p class="text-xs font-mono font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              // NEED HELP FIXING THESE?
+            </p>
+            <h3 class="text-xl font-extrabold text-[var(--text-primary)]">
+              Want 90+ mobile PageSpeed without breaking your theme?
+            </h3>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+              I fix LCP, INP, CLS, and script bloat on WordPress, WooCommerce, Shopify, and Astro sites. Copy your Markdown report above and send it over.
+            </p>
+          </div>
+          <a
+            href="https://kiranm.in/services/page-speed-optimization"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-tactile px-6 py-3 text-sm whitespace-nowrap shrink-0"
+          >
+            <span>Explore Speed Optimization</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-[var(--border-subtle)] py-6 text-center text-xs font-mono text-[var(--text-muted)]">
+      Built by <a href="https://kiranm.in" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--text-primary)]">Kiran M.</a> &middot; Powered by Google PageSpeed Insights v5 API
+    </footer>
+
+    <script is:inline>
+      (() => {
+        // Theme toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeLabel = document.getElementById('theme-label');
+        function syncThemeLabel() {
+          const isDark = document.documentElement.classList.contains('dark');
+          if (themeLabel) themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+        syncThemeLabel();
+        themeBtn?.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('cwv-theme', isDark ? 'dark' : 'light');
+          syncThemeLabel();
+        });
+
+        // Strategy toggle
+        let strategy = 'mobile';
+        const strategyBtns = document.querySelectorAll('.strategy-btn');
+        strategyBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            strategy = btn.getAttribute('data-strategy') || 'mobile';
+            strategyBtns.forEach((b) => {
+              const active = b.getAttribute('data-strategy') === strategy;
+              b.setAttribute('aria-pressed', active ? 'true' : 'false');
+              b.className = active
+                ? 'strategy-btn px-3.5 rounded-[6px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer'
+                : 'strategy-btn px-3.5 rounded-[6px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer';
+            });
+          });
+        });
+
+        const urlInput = document.getElementById('audit-url');
+        document.querySelectorAll('.preset-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (urlInput) urlInput.value = btn.getAttribute('data-preset') || '';
+          });
+        });
+
+        const form = document.getElementById('audit-form');
+        const runBtn = document.getElementById('run-audit-btn');
+        const runBtnText = document.getElementById('run-btn-text');
+        const loadingEl = document.getElementById('audit-loading');
+        const loadingStage = document.getElementById('loading-stage');
+        const loadingBar = document.getElementById('loading-bar');
+        const errorEl = document.getElementById('audit-error');
+        const resultsEl = document.getElementById('audit-results');
+
+        let latestReport = null;
+        let stageTimer = null;
+
+        function setLoading(isLoading) {
+          if (runBtn) runBtn.disabled = isLoading;
+          if (runBtnText) runBtnText.textContent = isLoading ? 'Auditing...' : 'Run Live Audit';
+          loadingEl?.classList.toggle('hidden', !isLoading);
+
+          if (isLoading) {
+            errorEl?.classList.add('hidden');
+            resultsEl?.classList.add('hidden');
+            const stages = [
+              { text: 'Connecting to Google PageSpeed Insights...', pct: '22%' },
+              { text: `Running ${strategy} Lighthouse simulation...`, pct: '55%' },
+              { text: 'Checking 28-day CrUX field metrics...', pct: '78%' },
+              { text: 'Ranking bottlenecks & savings...', pct: '92%' },
+            ];
+            let i = 0;
+            if (loadingStage) loadingStage.textContent = stages[0].text;
+            if (loadingBar) loadingBar.style.width = stages[0].pct;
+            stageTimer = setInterval(() => {
+              i = Math.min(i + 1, stages.length - 1);
+              if (loadingStage) loadingStage.textContent = stages[i].text;
+              if (loadingBar) loadingBar.style.width = stages[i].pct;
+            }, 3500);
+          } else if (stageTimer) {
+            clearInterval(stageTimer);
+            stageTimer = null;
+          }
+        }
+
+        function scoreBadgeClass(score) {
+          if (score === null || score === undefined) return 'text-[var(--text-muted)] border-[var(--border-subtle)] bg-[var(--bg-surface)]';
+          if (score >= 90) return 'text-emerald-600 dark:text-emerald-400 border-emerald-500/40 bg-emerald-500/10';
+          if (score >= 50) return 'text-amber-600 dark:text-amber-400 border-amber-500/40 bg-amber-500/10';
+          return 'text-rose-600 dark:text-rose-400 border-rose-500/40 bg-rose-500/10';
+        }
+
+        function fieldBadgeClass(cat) {
+          if (cat === 'FAST') return 'text-emerald-600 dark:text-emerald-400 border-emerald-500/40 bg-emerald-500/10';
+          if (cat === 'AVERAGE') return 'text-amber-600 dark:text-amber-400 border-amber-500/40 bg-amber-500/10';
+          if (cat === 'SLOW') return 'text-rose-600 dark:text-rose-400 border-rose-500/40 bg-rose-500/10';
+          return 'text-[var(--text-muted)] border-[var(--border-subtle)] bg-[var(--bg-surface)]';
+        }
+
+        function escapeHtml(str) {
+          return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        function renderResults(data) {
+          latestReport = data;
+          document.getElementById('res-strategy').textContent = data.strategy.toUpperCase();
+          document.getElementById('res-url').textContent = data.finalUrl || data.auditedUrl;
+          document.getElementById('res-time').textContent = `Scanned at ${new Date(data.fetchTime).toLocaleString()}`;
+
+          // 4 Category Score Cards
+          const scoreDefs = [
+            { key: 'performance', label: 'Performance' },
+            { key: 'accessibility', label: 'Accessibility' },
+            { key: 'bestPractices', label: 'Best Practices' },
+            { key: 'seo', label: 'SEO' },
+          ];
+          const scoresGrid = document.getElementById('scores-grid');
+          if (scoresGrid) {
+            scoresGrid.innerHTML = scoreDefs
+              .map(({ key, label }) => {
+                const val = data.scores?.[key];
+                const barColor =
+                  val === null ? 'bg-zinc-500' : val >= 90 ? 'bg-emerald-500' : val >= 50 ? 'bg-amber-500' : 'bg-rose-500';
+                return `
+                  <div class="card-tactile p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-xs font-mono font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)]">${label}</span>
+                      <span class="px-2 py-0.5 rounded-[4px] border text-xs font-mono font-bold ${scoreBadgeClass(val)}">
+                        ${val ?? '—'}
+                      </span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-[var(--bg-surface)] overflow-hidden">
+                      <div class="h-full ${barColor}" style="width: ${val ?? 0}%;"></div>
+                    </div>
+                  </div>
+                `;
+              })
+              .join('');
+          }
+
+          // CrUX Field Data
+          const cruxBadge = document.getElementById('crux-badge');
+          const cruxEl = document.getElementById('crux-metrics');
+          const overall = data.fieldData?.overallCategory;
+          if (cruxBadge) {
+            cruxBadge.textContent = overall || 'NO FIELD DATA';
+            cruxBadge.className = `px-2.5 py-1 rounded-[5px] text-[11px] font-mono font-bold border ${fieldBadgeClass(overall)}`;
+          }
+          if (cruxEl) {
+            if (!data.fieldData?.hasData) {
+              cruxEl.innerHTML = `<p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed py-4">Not enough 28-day real-user Chrome traffic for CrUX field data on this URL. Use the Lighthouse Lab metrics on the right instead.</p>`;
+            } else {
+              const fieldRows = [
+                { label: 'Largest Contentful Paint (LCP)', item: data.fieldData.lcp },
+                { label: 'Interaction to Next Paint (INP)', item: data.fieldData.inp },
+                { label: 'Cumulative Layout Shift (CLS)', item: data.fieldData.cls },
+                { label: 'First Contentful Paint (FCP)', item: data.fieldData.fcp },
+                { label: 'Time to First Byte (TTFB)', item: data.fieldData.ttfb },
+              ].filter((r) => r.item);
+
+              cruxEl.innerHTML = fieldRows
+                .map(
+                  (r) => `
+                  <div class="flex items-center justify-between gap-3 py-2 border-b border-[var(--border-subtle)] last:border-b-0">
+                    <span class="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">${r.label}</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <span class="font-mono text-xs sm:text-sm font-bold text-[var(--text-primary)]">${escapeHtml(r.item.displayValue)}</span>
+                      <span class="px-2 py-0.5 rounded-[4px] border text-[10px] font-mono font-bold ${fieldBadgeClass(r.item.category)}">${escapeHtml(r.item.category)}</span>
+                    </div>
+                  </div>
+                `,
+                )
+                .join('');
+            }
+          }
+
+          // Lab Metrics
+          const labEl = document.getElementById('lab-metrics');
+          if (labEl) {
+            const labRows = [
+              data.labData?.lcp,
+              data.labData?.tbt,
+              data.labData?.cls,
+              data.labData?.fcp,
+              data.labData?.si,
+              data.labData?.ttfb,
+            ].filter(Boolean);
+
+            labEl.innerHTML = labRows
+              .map((m) => {
+                const pct = typeof m.score === 'number' ? Math.round(m.score * 100) : null;
+                return `
+                  <div class="flex items-center justify-between gap-3 py-2 border-b border-[var(--border-subtle)] last:border-b-0">
+                    <span class="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">${escapeHtml(m.title)}</span>
+                    <span class="px-2.5 py-0.5 rounded-[4px] border text-xs font-mono font-bold ${scoreBadgeClass(pct)}">
+                      ${escapeHtml(m.displayValue)}
+                    </span>
+                  </div>
+                `;
+              })
+              .join('');
+          }
+
+          // Opportunities
+          const oppEl = document.getElementById('opportunities-list');
+          if (oppEl) {
+            if (!data.opportunities || data.opportunities.length === 0) {
+              oppEl.innerHTML = `<p class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold py-4">No major Lighthouse speed bottlenecks detected.</p>`;
+            } else {
+              oppEl.innerHTML = data.opportunities
+                .map((op) => {
+                  const savings = [];
+                  if (op.savingsMs > 0) savings.push(`${op.savingsMs} ms`);
+                  if (op.savingsBytes > 0) savings.push(`${Math.round(op.savingsBytes / 1024)} KB`);
+                  if (op.displayValue) savings.push(op.displayValue);
+                  const badge = savings[0] || 'Needs review';
+                  return `
+                    <div class="py-4 space-y-1.5">
+                      <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="text-sm font-bold text-[var(--text-primary)]">${escapeHtml(op.title)}</h4>
+                        <span class="px-2 py-0.5 rounded-[4px] border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-mono font-bold">
+                          ${escapeHtml(badge)}
+                        </span>
+                      </div>
+                      <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(op.description)}</p>
+                    </div>
+                  `;
+                })
+                .join('');
+            }
+          }
+
+          resultsEl?.classList.remove('hidden');
+        }
+
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const targetUrl = urlInput?.value?.trim();
+          if (!targetUrl) return;
+
+          setLoading(true);
+          try {
+            const res = await fetch('/api/audit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: targetUrl, strategy }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || `Request failed (${res.status})`);
+            }
+            renderResults(data);
+          } catch (err) {
+            if (errorEl) {
+              errorEl.textContent = err instanceof Error ? err.message : 'Unable to complete audit.';
+              errorEl.classList.remove('hidden');
+            }
+          } finally {
+            setLoading(false);
+          }
+        });
+
+        // Copy Markdown Report
+        document.getElementById('copy-md-btn')?.addEventListener('click', async (e) => {
+          if (!latestReport) return;
+          const d = latestReport;
+          const md = [
+            `# CWV Audit Report: ${d.finalUrl}`,
+            `- **Strategy:** ${d.strategy}`,
+            `- **Performance:** ${d.scores?.performance ?? '—'} | **Accessibility:** ${d.scores?.accessibility ?? '—'} | **Best Practices:** ${d.scores?.bestPractices ?? '—'} | **SEO:** ${d.scores?.seo ?? '—'}`,
+            '',
+            '## Lab Metrics',
+            `- LCP: ${d.labData?.lcp?.displayValue ?? '—'}`,
+            `- TBT: ${d.labData?.tbt?.displayValue ?? '—'}`,
+            `- CLS: ${d.labData?.cls?.displayValue ?? '—'}`,
+            `- FCP: ${d.labData?.fcp?.displayValue ?? '—'}`,
+            '',
+            '## Top Bottlenecks',
+            ...(d.opportunities || []).map((o) => `- **${o.title}** (${o.savingsMs ? `${o.savingsMs} ms` : o.displayValue || 'check'})`),
+          ].join('\n');
+          await navigator.clipboard.writeText(md);
+          const btn = e.currentTarget;
+          btn.textContent = 'Copied!';
+          setTimeout(() => {
+            btn.textContent = 'Copy Markdown';
+          }, 1800);
+        });
+
+        // Download JSON Report
+        document.getElementById('download-json-btn')?.addEventListener('click', () => {
+          if (!latestReport) return;
+          const blob = new Blob([JSON.stringify(latestReport, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `cwv-audit-${latestReport.strategy}.json`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        });
+      })();
+    </script>
+  </body>
+</html>

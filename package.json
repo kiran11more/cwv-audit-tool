@@ -1,0 +1,20 @@
+{
+  "name": "cwv-audit-tool",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Interactive Core Web Vitals & PageSpeed Insights audit tool built with Astro, Tailwind CSS, and Cloudflare Pages Functions.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.7",
+    "tailwindcss": "^4.3.5"
+  }
+}
