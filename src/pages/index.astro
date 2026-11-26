@@ -21,29 +21,34 @@ import '../styles/global.css';
     />
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem('cwv-theme');
+        const stored = localStorage.getItem('theme-preference');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const isDark = stored ? stored === 'dark' : prefersDark;
-        document.documentElement.classList.toggle('dark', isDark);
+        const resolved = stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', resolved === 'dark');
+        document.documentElement.classList.toggle('light', resolved === 'light');
       })();
     </script>
   </head>
 
   <body class="min-h-screen flex flex-col antialiased relative overflow-x-clip">
-    <!-- Subtle Architectural Grid Backdrop -->
+    <!-- Subtle Architectural Grid & Aurora Backdrop -->
+    <div class="cwv-aurora pointer-events-none fixed inset-x-0 top-0 h-[560px] z-0" aria-hidden="true"></div>
     <div class="cwv-grid-bg pointer-events-none fixed inset-x-0 top-0 h-[520px] opacity-45 z-0" aria-hidden="true"></div>
 
-    <!-- Top Header -->
-    <header class="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/90 backdrop-blur-md">
+    <!-- Top Liquid-Glass Header -->
+    <header class="sticky top-0 z-30 border-b border-[var(--border-subtle)] backdrop-blur-md" style="background-color: var(--liquid-glass-header);">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        <a href="/cwv-audit" class="inline-flex items-center gap-2.5 font-extrabold tracking-tight text-base sm:text-lg">
-          <svg class="w-8 h-8 shrink-0" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-            <rect width="64" height="64" rx="14" fill="#111111" />
-            <rect x="4" y="4" width="56" height="56" rx="11" stroke="#FACC15" stroke-width="3.5" />
-            <path d="M18 42L27 24L35 35L46 18" stroke="#FACC15" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="46" cy="18" r="4.5" fill="#FACC15" />
-          </svg>
-          <span>CWV Audit Tool</span>
+        <a href="/cwv-audit" class="cwv-wordmark font-extrabold tracking-tight text-lg sm:text-xl">
+          <span class="cwv-architect-stamp" aria-hidden="true">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 17l5.5-7.5 4.5 4.5L20 6" />
+              <circle cx="20" cy="6" r="1.75" fill="var(--tactile-accent)" stroke="none" />
+            </svg>
+          </span>
+          <span class="inline-flex items-baseline">
+            <span>CWV Audit</span>
+            <span class="cwv-wordmark-dot" aria-hidden="true"></span>
+          </span>
         </a>
 
         <div class="flex items-center gap-3">
@@ -51,22 +56,56 @@ import '../styles/global.css';
             href="https://kiranm.in/"
             class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            <span>&larr; Portfolio</span>
+            <span>&larr; Back to Portfolio</span>
           </a>
 
-          <button
-            id="theme-toggle"
-            type="button"
-            aria-label="Toggle color theme"
-            class="px-3 py-1.5 rounded-[7px] border border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-semibold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+          <!-- 3-Way System / Light / Dark Theme Toggle (synced with kiranm.in) -->
+          <div
+            role="group"
+            aria-label="Theme switcher"
+            class="inline-flex items-center p-1 rounded-[8px] border border-[var(--border-strong)] bg-[var(--bg-surface)]"
           >
-            <span id="theme-label">Light Mode</span>
-          </button>
+            <button
+              type="button"
+              data-theme-opt="system"
+              aria-label="System theme"
+              title="System theme"
+              class="theme-opt-btn p-1.5 rounded-[5px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <path d="M8 21h8M12 17v4" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              data-theme-opt="light"
+              aria-label="Light theme"
+              title="Light theme"
+              class="theme-opt-btn p-1.5 rounded-[5px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              data-theme-opt="dark"
+              aria-label="Dark theme"
+              title="Dark theme"
+              class="theme-opt-btn p-1.5 rounded-[5px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
-    <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10">
+    <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-12">
       <!-- Centered Hero & Audit Form -->
       <section class="max-w-3xl mx-auto text-center space-y-6">
         <div class="space-y-3.5">
@@ -143,82 +182,123 @@ import '../styles/global.css';
         </div>
       </section>
 
-      <!-- Pre-Scan Hero Showcase Card (Home Hero Style) -->
-      <section id="preview-showcase" class="max-w-3xl mx-auto">
-        <div class="card-tactile p-4 sm:p-6 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
-            <div class="flex items-center gap-2 font-mono text-xs font-bold tracking-[0.08em] text-[var(--text-primary)]">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span>SAMPLE BENCHMARK</span>
+      <!-- Pre-Scan Resources & Core Web Vitals Reference -->
+      <section id="resources-section" class="max-w-4xl mx-auto space-y-6">
+        <!-- Core Web Vitals Thresholds -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card-tactile p-5 space-y-2">
+            <div class="flex items-center justify-between gap-2 font-mono">
+              <span class="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-primary)]">LCP &middot; Loading</span>
+              <span class="px-2 py-0.5 rounded-[4px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                &le; 2.5s
+              </span>
             </div>
-            <div class="inline-flex items-center gap-1.5 text-[11px] font-mono text-[var(--text-muted)]">
-              <span>Enter a URL above or click a preset to run a live scan</span>
-            </div>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Largest Contentful Paint measures how quickly the main hero image or headline renders for users.
+            </p>
           </div>
 
-          <div class="p-4 sm:p-5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] space-y-5">
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
-              <!-- Circular Ring -->
-              <div class="sm:col-span-4 flex flex-col items-center justify-center p-4 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <div class="relative w-24 h-24 flex items-center justify-center">
-                  <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-                    <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" fill="none" class="text-[var(--border-subtle)]" />
-                    <circle cx="50" cy="50" r="42" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="2.64" />
-                  </svg>
-                  <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span class="text-2xl font-extrabold text-[var(--text-primary)] leading-none">99</span>
-                    <span class="text-[9px] font-mono uppercase tracking-[0.12em] text-[var(--text-muted)] mt-1">MOBILE</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- LCP / INP / CLS + Payload -->
-              <div class="sm:col-span-8 space-y-3">
-                <div class="grid grid-cols-3 gap-2.5 font-mono">
-                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">LCP</span>
-                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">0.7s</span>
-                  </div>
-                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">INP</span>
-                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">42ms</span>
-                  </div>
-                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">CLS</span>
-                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">0.00</span>
-                  </div>
-                </div>
-
-                <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-2">
-                  <div class="flex items-center justify-between text-xs font-mono">
-                    <span class="text-[var(--text-muted)]">Payload</span>
-                    <span class="font-bold text-[var(--text-primary)]">240 KB &middot; 9 requests</span>
-                  </div>
-                  <div class="w-full h-1.5 rounded-full bg-[var(--bg-canvas)] overflow-hidden">
-                    <div class="h-full bg-emerald-500 rounded-full" style="width: 24%;"></div>
-                  </div>
-                </div>
-              </div>
+          <div class="card-tactile p-5 space-y-2">
+            <div class="flex items-center justify-between gap-2 font-mono">
+              <span class="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-primary)]">INP &middot; Interactivity</span>
+              <span class="px-2 py-0.5 rounded-[4px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                &le; 200ms
+              </span>
             </div>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Interaction to Next Paint tracks main-thread responsiveness when visitors click buttons or menus.
+            </p>
+          </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-[var(--border-subtle)] font-mono text-xs text-[var(--text-secondary)]">
-              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span>28-Day CrUX Field Data</span>
-              </div>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span>Parallel Mobile + Desktop</span>
-              </div>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span>Savings Ranked (ms &amp; KB)</span>
-              </div>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span>Markdown &amp; JSON Export</span>
-              </div>
+          <div class="card-tactile p-5 space-y-2">
+            <div class="flex items-center justify-between gap-2 font-mono">
+              <span class="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-primary)]">CLS &middot; Stability</span>
+              <span class="px-2 py-0.5 rounded-[4px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                &le; 0.10
+              </span>
             </div>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Cumulative Layout Shift measures unexpected jumps caused by unsized images, ads, or webfont swaps.
+            </p>
+          </div>
+        </div>
+
+        <!-- Performance Guides & Official Docs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="card-tactile p-5 sm:p-6 space-y-3.5">
+            <p class="text-[11px] font-mono font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              // PERFORMANCE PLAYBOOKS
+            </p>
+            <ul class="space-y-2.5 text-sm">
+              <li>
+                <a
+                  href="https://kiranm.in/blog/solving-cls-in-dynamic-ecommerce-grids/"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>How to Fix CLS in WooCommerce &amp; Shopify Grids</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://kiranm.in/blog/zero-bloat-woocommerce-checkout/"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>WooCommerce Checkout Speed Optimization Guide</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://kiranm.in/services/page-speed-optimization/"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>Page Speed &amp; Core Web Vitals Service</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-tactile p-5 sm:p-6 space-y-3.5">
+            <p class="text-[11px] font-mono font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              // OFFICIAL DOCUMENTATION
+            </p>
+            <ul class="space-y-2.5 text-sm">
+              <li>
+                <a
+                  href="https://web.dev/articles/vitals"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>web.dev: Understanding Core Web Vitals</span>
+                  <span aria-hidden="true">&nearr;</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developers.google.com/speed/docs/insights/v5/about"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>Google PageSpeed Insights v5 Docs</span>
+                  <span aria-hidden="true">&nearr;</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developer.chrome.com/docs/crux"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 font-semibold text-[var(--text-primary)] hover:underline decoration-[var(--tactile-accent)] decoration-2 underline-offset-4"
+                >
+                  <span>Chrome UX Report (CrUX) Methodology</span>
+                  <span aria-hidden="true">&nearr;</span>
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
@@ -406,17 +486,40 @@ import '../styles/global.css';
 
     <script is:inline>
       (() => {
-        const themeBtn = document.getElementById('theme-toggle');
-        const themeLabel = document.getElementById('theme-label');
-        function syncThemeLabel() {
-          const isDark = document.documentElement.classList.contains('dark');
-          if (themeLabel) themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        // 3-Way Theme Switcher synced with kiranm.in ('theme-preference')
+        const STORAGE_KEY = 'theme-preference';
+        const themeBtns = document.querySelectorAll('.theme-opt-btn');
+
+        function applyTheme(pref) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const resolved = pref === 'light' || pref === 'dark' ? pref : prefersDark ? 'dark' : 'light';
+          document.documentElement.classList.toggle('dark', resolved === 'dark');
+          document.documentElement.classList.toggle('light', resolved === 'light');
+
+          themeBtns.forEach((btn) => {
+            const active = btn.getAttribute('data-theme-opt') === pref;
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+            btn.className = active
+              ? 'theme-opt-btn p-1.5 rounded-[5px] bg-[var(--tactile-accent)] text-[#111111] transition-colors cursor-pointer'
+              : 'theme-opt-btn p-1.5 rounded-[5px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer';
+          });
         }
-        syncThemeLabel();
-        themeBtn?.addEventListener('click', () => {
-          const isDark = document.documentElement.classList.toggle('dark');
-          localStorage.setItem('cwv-theme', isDark ? 'dark' : 'light');
-          syncThemeLabel();
+
+        const initialPref = localStorage.getItem(STORAGE_KEY) || 'system';
+        applyTheme(initialPref);
+
+        themeBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const pref = btn.getAttribute('data-theme-opt') || 'system';
+            localStorage.setItem(STORAGE_KEY, pref);
+            applyTheme(pref);
+          });
+        });
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if ((localStorage.getItem(STORAGE_KEY) || 'system') === 'system') {
+            applyTheme('system');
+          }
         });
 
         const urlInput = document.getElementById('audit-url');
@@ -433,7 +536,7 @@ import '../styles/global.css';
         const loadingStage = document.getElementById('loading-stage');
         const loadingBar = document.getElementById('loading-bar');
         const errorEl = document.getElementById('audit-error');
-        const previewEl = document.getElementById('preview-showcase');
+        const resourcesEl = document.getElementById('resources-section');
         const resultsEl = document.getElementById('audit-results');
 
         let fullPayload = null;
@@ -448,7 +551,7 @@ import '../styles/global.css';
           if (isLoading) {
             errorEl?.classList.add('hidden');
             resultsEl?.classList.add('hidden');
-            previewEl?.classList.add('hidden');
+            resourcesEl?.classList.add('hidden');
             const stages = [
               { text: 'Connecting to Google PageSpeed Insights...', pct: '22%' },
               { text: 'Running Mobile & Desktop Lighthouse simulations...', pct: '55%' },
@@ -544,7 +647,6 @@ import '../styles/global.css';
             }`;
           }
 
-          // Hero Circular Score Ring
           const circumference = 263.89;
           const arc = document.getElementById('hero-ring-arc');
           const ringScore = document.getElementById('hero-ring-score');
@@ -557,7 +659,6 @@ import '../styles/global.css';
           if (ringScore) ringScore.textContent = perf ?? '—';
           if (ringLabel) ringLabel.textContent = activeView.toUpperCase();
 
-          // Hero 3 CWV Tiles (LCP, INP or TBT, CLS)
           const cwvTiles = document.getElementById('hero-cwv-tiles');
           if (cwvTiles) {
             const lcpVal = data.fieldData?.lcp?.displayValue || data.labData?.lcp?.displayValue || '—';
@@ -593,7 +694,6 @@ import '../styles/global.css';
               .join('');
           }
 
-          // Hero Payload Bar
           const kb = data.payload?.totalKb;
           const reqs = data.payload?.requestCount;
           const payloadText = document.getElementById('hero-payload-text');
@@ -611,7 +711,6 @@ import '../styles/global.css';
             payloadBar.style.width = `${widthPct}%`;
           }
 
-          // 4 Category Pills
           const scoreDefs = [
             { key: 'performance', label: 'Performance' },
             { key: 'accessibility', label: 'Accessibility' },
@@ -637,7 +736,6 @@ import '../styles/global.css';
               .join('');
           }
 
-          // CrUX Field Data
           const cruxBadge = document.getElementById('crux-badge');
           const cruxEl = document.getElementById('crux-metrics');
           const overall = data.fieldData?.overallCategory;
@@ -673,7 +771,6 @@ import '../styles/global.css';
             }
           }
 
-          // Lab Metrics
           const labEl = document.getElementById('lab-metrics');
           if (labEl) {
             const labRows = [
@@ -700,7 +797,6 @@ import '../styles/global.css';
               .join('');
           }
 
-          // Opportunities
           const oppEl = document.getElementById('opportunities-list');
           if (oppEl) {
             if (!data.opportunities || data.opportunities.length === 0) {
@@ -765,7 +861,7 @@ import '../styles/global.css';
               errorEl.textContent = err instanceof Error ? err.message : 'Unable to complete audit.';
               errorEl.classList.remove('hidden');
             }
-            previewEl?.classList.remove('hidden');
+            resourcesEl?.classList.remove('hidden');
           } finally {
             setLoading(false);
           }

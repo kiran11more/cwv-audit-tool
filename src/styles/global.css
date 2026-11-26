@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --bg-canvas: #faf8f4;
   --bg-surface: #f2efe8;
   --bg-surface-elevated: #ffffff;
@@ -12,7 +13,8 @@
   --tactile-accent: #facc15;
   --tactile-ink: #111111;
   --tactile-border: #111111;
-  --tactile-shadow: 0 4px 0 #111111;
+  --tactile-shadow: 0 3px 0 #111111;
+  --liquid-glass-header: rgba(250, 248, 244, 0.84);
 }
 
 html.dark {
@@ -28,18 +30,18 @@ html.dark {
   --tactile-accent: #facc15;
   --tactile-ink: #111111;
   --tactile-border: #111111;
-  --tactile-shadow: 0 4px 0 #000000;
-}
-
-#audit-url {
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
+  --tactile-shadow: 0 3px 0 #000000;
+  --liquid-glass-header: rgba(15, 16, 18, 0.84);
 }
 
 body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 .cwv-grid-bg {
@@ -51,15 +53,22 @@ body {
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 45%, transparent 100%);
 }
 
-.font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+.cwv-aurora {
+  background:
+    radial-gradient(45% 55% at 50% 10%, rgba(250, 204, 21, 0.14), transparent 70%),
+    radial-gradient(35% 45% at 80% 25%, rgba(56, 189, 248, 0.08), transparent 70%);
+}
+
+#audit-url {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
 }
 
 .card-tactile {
   background-color: var(--bg-surface-elevated);
   border: 1.5px solid var(--border-strong);
   border-radius: 10px;
-  box-shadow: 0 3px 0 var(--border-strong);
+  box-shadow: var(--tactile-shadow);
 }
 
 .btn-tactile {
@@ -90,4 +99,50 @@ body {
 .btn-tactile:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+/* Tactile Architect Stamp Logo (matching main portfolio KiranM. wordmark) */
+.cwv-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cwv-architect-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid var(--text-primary);
+  border-radius: 7px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 3px 3px 0 var(--tactile-accent);
+  flex-shrink: 0;
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cwv-wordmark:hover .cwv-architect-stamp {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--tactile-accent);
+}
+
+.cwv-wordmark-dot {
+  display: inline-block;
+  width: 0.3rem;
+  height: 0.3rem;
+  margin-inline-start: 0.12rem;
+  background-color: var(--tactile-accent);
+  border: 1px solid rgba(17, 17, 17, 0.85);
+  border-radius: 1.5px;
+  flex-shrink: 0;
+}
+
+html.dark .cwv-wordmark-dot {
+  border-color: transparent;
 }
