@@ -29,11 +29,14 @@ import '../styles/global.css';
     </script>
   </head>
 
-  <body class="min-h-screen flex flex-col antialiased">
+  <body class="min-h-screen flex flex-col antialiased relative overflow-x-clip">
+    <!-- Subtle Architectural Grid Backdrop -->
+    <div class="cwv-grid-bg pointer-events-none fixed inset-x-0 top-0 h-[520px] opacity-45 z-0" aria-hidden="true"></div>
+
     <!-- Top Header -->
     <header class="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/90 backdrop-blur-md">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        <a href="/" class="inline-flex items-center gap-2.5 font-extrabold tracking-tight text-base sm:text-lg">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <a href="/cwv-audit" class="inline-flex items-center gap-2.5 font-extrabold tracking-tight text-base sm:text-lg">
           <span class="w-8 h-8 rounded-[7px] bg-[#111111] border-[1.5px] border-[#FACC15] flex items-center justify-center text-[#FACC15] font-mono text-xs font-bold">
             CWV
           </span>
@@ -42,13 +45,10 @@ import '../styles/global.css';
 
         <div class="flex items-center gap-3">
           <a
-            href="https://kiranm.in/services/page-speed-optimization"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="https://kiranm.in/"
             class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            <span>By Kiran M.</span>
-            <span aria-hidden="true">&nearr;</span>
+            <span>&larr; Portfolio</span>
           </a>
 
           <button
@@ -63,23 +63,23 @@ import '../styles/global.css';
       </div>
     </header>
 
-    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10">
-      <!-- Hero & Audit Form -->
-      <section class="space-y-6 max-w-4xl">
-        <div class="space-y-3">
+    <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10">
+      <!-- Centered Hero & Audit Form -->
+      <section class="max-w-3xl mx-auto text-center space-y-6">
+        <div class="space-y-3.5">
           <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[11px] font-mono font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
             <span class="w-2 h-2 rounded-full bg-[var(--tactile-accent)]"></span>
             <span>// LIVE PAGESPEED INSIGHTS &amp; CRUX ANALYZER</span>
           </p>
-          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] leading-[1.1] text-[var(--text-primary)]">
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] leading-[1.08] text-[var(--text-primary)] [text-wrap:balance]">
             Audit your Core Web Vitals in seconds.
           </h1>
-          <p class="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-            Run a single live Google PageSpeed Insights v5 scan to inspect both <strong>Mobile &amp; Desktop</strong> scores, 28-day real-user CrUX field data, and prioritized speed bottlenecks.
+          <p class="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
+            Run a single live Google PageSpeed Insights scan to inspect <strong>Mobile &amp; Desktop</strong> scores, 28-day real-user CrUX field data, and prioritized speed bottlenecks.
           </p>
         </div>
 
-        <form id="audit-form" class="card-tactile p-4 sm:p-5 space-y-4">
+        <form id="audit-form" class="card-tactile p-4 sm:p-5 space-y-3.5 text-left">
           <div class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1 relative">
               <label for="audit-url" class="sr-only">Website URL</label>
@@ -104,8 +104,8 @@ import '../styles/global.css';
             </button>
           </div>
 
-          <!-- Quick Demo Presets -->
-          <div class="flex flex-wrap items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+          <!-- Centered Quick Demo Presets -->
+          <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-mono text-[var(--text-muted)] pt-0.5">
             <span>Try:</span>
             <button type="button" data-preset="https://kiranm.in" class="preset-btn px-2.5 py-1 rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer">
               kiranm.in
@@ -120,7 +120,7 @@ import '../styles/global.css';
         </form>
 
         <!-- Staged Loading State -->
-        <div id="audit-loading" class="hidden card-tactile p-6 space-y-4">
+        <div id="audit-loading" class="hidden card-tactile p-6 space-y-4 text-left">
           <div class="flex items-center gap-3">
             <span class="w-3 h-3 rounded-full bg-[var(--tactile-accent)] animate-ping"></span>
             <p id="loading-stage" class="font-mono text-sm font-bold text-[var(--text-primary)]">
@@ -136,72 +136,200 @@ import '../styles/global.css';
         </div>
 
         <!-- Error State -->
-        <div id="audit-error" class="hidden card-tactile p-5 border-rose-500 bg-rose-500/10 text-sm text-rose-600 dark:text-rose-400 font-medium">
+        <div id="audit-error" class="hidden card-tactile p-5 border-rose-500 bg-rose-500/10 text-sm text-rose-600 dark:text-rose-400 font-medium text-left">
         </div>
       </section>
 
-      <!-- Results Dashboard -->
-      <section id="audit-results" class="hidden space-y-8">
-        <!-- Result Header, Instant Device Tabs & Export Actions -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-[var(--border-subtle)]">
-          <div class="space-y-1">
-            <p class="text-xs font-mono uppercase tracking-[0.12em] text-[var(--text-muted)]">
-              Audit Report &middot; <span id="res-strategy" class="text-[var(--text-primary)] font-bold">MOBILE</span>
-            </p>
-            <h2 id="res-url" class="text-lg sm:text-xl font-extrabold font-mono text-[var(--text-primary)] break-all"></h2>
-            <p id="res-time" class="text-xs font-mono text-[var(--text-muted)]"></p>
+      <!-- Pre-Scan Hero Showcase Card (Home Hero Style) -->
+      <section id="preview-showcase" class="max-w-3xl mx-auto">
+        <div class="card-tactile p-4 sm:p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
+            <div class="flex items-center gap-2 font-mono text-xs font-bold tracking-[0.08em] text-[var(--text-primary)]">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span>SAMPLE BENCHMARK</span>
+            </div>
+            <div class="inline-flex items-center gap-1.5 text-[11px] font-mono text-[var(--text-muted)]">
+              <span>Enter a URL above or click a preset to run a live scan</span>
+            </div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 shrink-0">
-            <!-- Instant Mobile / Desktop Switcher (with live score badges) -->
-            <div
-              role="tablist"
-              aria-label="Switch device view"
-              class="inline-flex p-1 rounded-[8px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface)]"
-            >
-              <button
-                id="tab-mobile"
-                type="button"
-                role="tab"
-                data-view="mobile"
-                aria-selected="true"
-                class="view-tab inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer"
-              >
-                <span>Mobile</span>
-                <span id="tab-mobile-score" class="px-1.5 py-0.5 rounded-[4px] bg-black/15 text-[11px]">—</span>
-              </button>
-              <button
-                id="tab-desktop"
-                type="button"
-                role="tab"
-                data-view="desktop"
-                aria-selected="false"
-                class="view-tab inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-              >
-                <span>Desktop</span>
-                <span id="tab-desktop-score" class="px-1.5 py-0.5 rounded-[4px] bg-[var(--bg-canvas)] text-[11px]">—</span>
-              </button>
+          <div class="p-4 sm:p-5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
+              <!-- Circular Ring -->
+              <div class="sm:col-span-4 flex flex-col items-center justify-center p-4 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <div class="relative w-24 h-24 flex items-center justify-center">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" fill="none" class="text-[var(--border-subtle)]" />
+                    <circle cx="50" cy="50" r="42" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="2.64" />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-2xl font-extrabold text-[var(--text-primary)] leading-none">99</span>
+                    <span class="text-[9px] font-mono uppercase tracking-[0.12em] text-[var(--text-muted)] mt-1">MOBILE</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LCP / INP / CLS + Payload -->
+              <div class="sm:col-span-8 space-y-3">
+                <div class="grid grid-cols-3 gap-2.5 font-mono">
+                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">LCP</span>
+                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">0.7s</span>
+                  </div>
+                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">INP</span>
+                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">42ms</span>
+                  </div>
+                  <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                    <span class="block text-[10px] text-[var(--text-muted)] uppercase">CLS</span>
+                    <span class="text-base sm:text-lg font-extrabold text-emerald-500">0.00</span>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-2">
+                  <div class="flex items-center justify-between text-xs font-mono">
+                    <span class="text-[var(--text-muted)]">Payload</span>
+                    <span class="font-bold text-[var(--text-primary)]">240 KB &middot; 9 requests</span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-[var(--bg-canvas)] overflow-hidden">
+                    <div class="h-full bg-emerald-500 rounded-full" style="width: 24%;"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <button
-              id="copy-md-btn"
-              type="button"
-              class="px-3.5 py-2 rounded-[7px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
-            >
-              Copy Markdown
-            </button>
-            <button
-              id="download-json-btn"
-              type="button"
-              class="px-3.5 py-2 rounded-[7px] border-[1.5px] border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
-            >
-              Download JSON
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-[var(--border-subtle)] font-mono text-xs text-[var(--text-secondary)]">
+              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>28-Day CrUX Field Data</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>Parallel Mobile + Desktop</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>Savings Ranked (ms &amp; KB)</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>Markdown &amp; JSON Export</span>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        <!-- 4 Lighthouse Category Scores -->
-        <div id="scores-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+      <!-- Live Results Dashboard -->
+      <section id="audit-results" class="hidden space-y-8 max-w-4xl mx-auto">
+        <!-- Hero-Style Summary Card -->
+        <div class="card-tactile p-4 sm:p-6 space-y-4">
+          <!-- Top Bar: URL + Device Switcher + Export -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-3.5 py-3 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
+            <div class="min-w-0 space-y-0.5">
+              <div class="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--text-muted)]">
+                <span id="res-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>CWV AUDIT &middot; <span id="res-strategy" class="text-[var(--text-primary)]">MOBILE</span></span>
+                <span>&middot;</span>
+                <span id="res-time"></span>
+              </div>
+              <h2 id="res-url" class="text-sm sm:text-base font-extrabold font-mono text-[var(--text-primary)] truncate"></h2>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <div
+                role="tablist"
+                aria-label="Switch device view"
+                class="inline-flex p-1 rounded-[7px] border border-[var(--border-strong)] bg-[var(--bg-surface)]"
+              >
+                <button
+                  id="tab-mobile"
+                  type="button"
+                  role="tab"
+                  data-view="mobile"
+                  aria-selected="true"
+                  class="view-tab inline-flex items-center gap-1.5 px-3 py-1 rounded-[5px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer"
+                >
+                  <span>Mobile</span>
+                  <span id="tab-mobile-score" class="px-1.5 py-0.5 rounded-[4px] bg-black/15 text-[10px]">—</span>
+                </button>
+                <button
+                  id="tab-desktop"
+                  type="button"
+                  role="tab"
+                  data-view="desktop"
+                  aria-selected="false"
+                  class="view-tab inline-flex items-center gap-1.5 px-3 py-1 rounded-[5px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                >
+                  <span>Desktop</span>
+                  <span id="tab-desktop-score" class="px-1.5 py-0.5 rounded-[4px] bg-[var(--bg-canvas)] text-[10px]">—</span>
+                </button>
+              </div>
+
+              <button
+                id="copy-md-btn"
+                type="button"
+                class="px-3 py-1.5 rounded-[7px] border border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+              >
+                Copy MD
+              </button>
+              <button
+                id="download-json-btn"
+                type="button"
+                class="px-3 py-1.5 rounded-[7px] border border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] text-xs font-mono font-bold text-[var(--text-primary)] hover:bg-[var(--tactile-accent)] hover:text-[#111111] transition-colors cursor-pointer"
+              >
+                JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Signature Score Ring + LCP/INP/CLS + Payload -->
+          <div class="p-4 sm:p-5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
+              <div class="sm:col-span-4 flex flex-col items-center justify-center p-4 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <div class="relative w-28 h-28 flex items-center justify-center">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" fill="none" class="text-[var(--border-subtle)]" />
+                    <circle
+                      id="hero-ring-arc"
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      stroke="#10b981"
+                      stroke-width="8"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-dasharray="263.89"
+                      stroke-dashoffset="263.89"
+                      class="transition-all duration-700"
+                    />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="hero-ring-score" class="text-3xl font-extrabold text-[var(--text-primary)] leading-none">—</span>
+                    <span id="hero-ring-label" class="text-[10px] font-mono uppercase tracking-[0.12em] text-[var(--text-muted)] mt-1">MOBILE</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sm:col-span-8 space-y-3">
+                <div id="hero-cwv-tiles" class="grid grid-cols-3 gap-2.5 font-mono"></div>
+
+                <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-2">
+                  <div class="flex items-center justify-between text-xs font-mono">
+                    <span class="text-[var(--text-muted)]">Total Payload</span>
+                    <span id="hero-payload-text" class="font-bold text-[var(--text-primary)]">—</span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-[var(--bg-canvas)] overflow-hidden">
+                    <div id="hero-payload-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 Category Pills -->
+            <div id="scores-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-[var(--border-subtle)]"></div>
+          </div>
+        </div>
 
         <!-- Field Data (CrUX) vs Lab Data (Lighthouse) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -260,8 +388,6 @@ import '../styles/global.css';
           </div>
           <a
             href="https://kiranm.in/services/page-speed-optimization"
-            target="_blank"
-            rel="noopener noreferrer"
             class="btn-tactile px-6 py-3 text-sm whitespace-nowrap shrink-0"
           >
             <span>Explore Speed Optimization</span>
@@ -271,13 +397,12 @@ import '../styles/global.css';
       </section>
     </main>
 
-    <footer class="border-t border-[var(--border-subtle)] py-6 text-center text-xs font-mono text-[var(--text-muted)]">
-      Built by <a href="https://kiranm.in" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--text-primary)]">Kiran M.</a> &middot; Powered by Google PageSpeed Insights v5 API
+    <footer class="relative z-10 border-t border-[var(--border-subtle)] py-6 text-center text-xs font-mono text-[var(--text-muted)]">
+      Built by <a href="https://kiranm.in/" class="underline hover:text-[var(--text-primary)]">Kiran M.</a> &middot; Powered by Google PageSpeed Insights v5 API
     </footer>
 
     <script is:inline>
       (() => {
-        // Theme toggle
         const themeBtn = document.getElementById('theme-toggle');
         const themeLabel = document.getElementById('theme-label');
         function syncThemeLabel() {
@@ -305,6 +430,7 @@ import '../styles/global.css';
         const loadingStage = document.getElementById('loading-stage');
         const loadingBar = document.getElementById('loading-bar');
         const errorEl = document.getElementById('audit-error');
+        const previewEl = document.getElementById('preview-showcase');
         const resultsEl = document.getElementById('audit-results');
 
         let fullPayload = null;
@@ -319,6 +445,7 @@ import '../styles/global.css';
           if (isLoading) {
             errorEl?.classList.add('hidden');
             resultsEl?.classList.add('hidden');
+            previewEl?.classList.add('hidden');
             const stages = [
               { text: 'Connecting to Google PageSpeed Insights...', pct: '22%' },
               { text: 'Running Mobile & Desktop Lighthouse simulations...', pct: '55%' },
@@ -337,6 +464,20 @@ import '../styles/global.css';
             clearInterval(stageTimer);
             stageTimer = null;
           }
+        }
+
+        function scoreColorHex(score) {
+          if (score === null || score === undefined) return '#71717a';
+          if (score >= 90) return '#10b981';
+          if (score >= 50) return '#f59e0b';
+          return '#f43f5e';
+        }
+
+        function scoreTextClass(score) {
+          if (score === null || score === undefined) return 'text-[var(--text-muted)]';
+          if (score >= 90) return 'text-emerald-500';
+          if (score >= 50) return 'text-amber-500';
+          return 'text-rose-500';
         }
 
         function scoreBadgeClass(score) {
@@ -376,8 +517,8 @@ import '../styles/global.css';
             tab.disabled = isDisabled;
             tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
             tab.className = isSelected
-              ? 'view-tab inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer'
-              : 'view-tab inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer disabled:opacity-40';
+              ? 'view-tab inline-flex items-center gap-1.5 px-3 py-1 rounded-[5px] text-xs font-mono font-bold transition-colors bg-[var(--tactile-accent)] text-[#111111] cursor-pointer'
+              : 'view-tab inline-flex items-center gap-1.5 px-3 py-1 rounded-[5px] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer disabled:opacity-40';
           });
         }
 
@@ -388,11 +529,86 @@ import '../styles/global.css';
 
           syncTabs();
 
+          const perf = data.scores?.performance;
           document.getElementById('res-strategy').textContent = activeView.toUpperCase();
           document.getElementById('res-url').textContent = data.finalUrl || data.auditedUrl;
-          document.getElementById('res-time').textContent = `Scanned at ${new Date(data.fetchTime).toLocaleString()}`;
+          document.getElementById('res-time').textContent = new Date(data.fetchTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          // 4 Category Score Cards
+          const statusDot = document.getElementById('res-status-dot');
+          if (statusDot) {
+            statusDot.className = `w-2.5 h-2.5 rounded-full shrink-0 ${
+              perf === null ? 'bg-zinc-500' : perf >= 90 ? 'bg-emerald-500' : perf >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+            }`;
+          }
+
+          // Hero Circular Score Ring
+          const circumference = 263.89;
+          const arc = document.getElementById('hero-ring-arc');
+          const ringScore = document.getElementById('hero-ring-score');
+          const ringLabel = document.getElementById('hero-ring-label');
+          if (arc) {
+            const pct = typeof perf === 'number' ? Math.max(0, Math.min(100, perf)) : 0;
+            arc.style.stroke = scoreColorHex(perf);
+            arc.style.strokeDashoffset = String(circumference * (1 - pct / 100));
+          }
+          if (ringScore) ringScore.textContent = perf ?? '—';
+          if (ringLabel) ringLabel.textContent = activeView.toUpperCase();
+
+          // Hero 3 CWV Tiles (LCP, INP or TBT, CLS)
+          const cwvTiles = document.getElementById('hero-cwv-tiles');
+          if (cwvTiles) {
+            const lcpVal = data.fieldData?.lcp?.displayValue || data.labData?.lcp?.displayValue || '—';
+            const lcpColor = data.fieldData?.lcp
+              ? (data.fieldData.lcp.category === 'FAST' ? 'text-emerald-500' : data.fieldData.lcp.category === 'AVERAGE' ? 'text-amber-500' : 'text-rose-500')
+              : scoreTextClass(typeof data.labData?.lcp?.score === 'number' ? Math.round(data.labData.lcp.score * 100) : null);
+
+            const hasInp = Boolean(data.fieldData?.inp);
+            const respLabel = hasInp ? 'INP' : 'TBT (LAB)';
+            const respVal = hasInp ? data.fieldData.inp.displayValue : (data.labData?.tbt?.displayValue || '—');
+            const respColor = hasInp
+              ? (data.fieldData.inp.category === 'FAST' ? 'text-emerald-500' : data.fieldData.inp.category === 'AVERAGE' ? 'text-amber-500' : 'text-rose-500')
+              : scoreTextClass(typeof data.labData?.tbt?.score === 'number' ? Math.round(data.labData.tbt.score * 100) : null);
+
+            const clsVal = data.fieldData?.cls?.displayValue || data.labData?.cls?.displayValue || '—';
+            const clsColor = data.fieldData?.cls
+              ? (data.fieldData.cls.category === 'FAST' ? 'text-emerald-500' : data.fieldData.cls.category === 'AVERAGE' ? 'text-amber-500' : 'text-rose-500')
+              : scoreTextClass(typeof data.labData?.cls?.score === 'number' ? Math.round(data.labData.cls.score * 100) : null);
+
+            cwvTiles.innerHTML = [
+              { label: 'LCP', val: lcpVal, color: lcpColor },
+              { label: respLabel, val: respVal, color: respColor },
+              { label: 'CLS', val: clsVal, color: clsColor },
+            ]
+              .map(
+                (t) => `
+                <div class="p-3 rounded-[7px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                  <span class="block text-[10px] text-[var(--text-muted)] uppercase">${t.label}</span>
+                  <span class="text-base sm:text-lg font-extrabold ${t.color}">${escapeHtml(t.val)}</span>
+                </div>
+              `,
+              )
+              .join('');
+          }
+
+          // Hero Payload Bar
+          const kb = data.payload?.totalKb;
+          const reqs = data.payload?.requestCount;
+          const payloadText = document.getElementById('hero-payload-text');
+          const payloadBar = document.getElementById('hero-payload-bar');
+          if (payloadText) {
+            const parts = [];
+            if (typeof kb === 'number') parts.push(`${kb.toLocaleString()} KB`);
+            if (typeof reqs === 'number') parts.push(`${reqs} requests`);
+            payloadText.textContent = parts.length ? parts.join(' · ') : '—';
+          }
+          if (payloadBar) {
+            const widthPct = typeof kb === 'number' ? Math.min(100, Math.max(8, Math.round((kb / 2500) * 100))) : 20;
+            const color = typeof kb === 'number' ? (kb <= 800 ? 'bg-emerald-500' : kb <= 1800 ? 'bg-amber-500' : 'bg-rose-500') : 'bg-zinc-500';
+            payloadBar.className = `h-full ${color} rounded-full transition-all duration-500`;
+            payloadBar.style.width = `${widthPct}%`;
+          }
+
+          // 4 Category Pills
           const scoreDefs = [
             { key: 'performance', label: 'Performance' },
             { key: 'accessibility', label: 'Accessibility' },
@@ -404,19 +620,14 @@ import '../styles/global.css';
             scoresGrid.innerHTML = scoreDefs
               .map(({ key, label }) => {
                 const val = data.scores?.[key];
-                const barColor =
-                  val === null ? 'bg-zinc-500' : val >= 90 ? 'bg-emerald-500' : val >= 50 ? 'bg-amber-500' : 'bg-rose-500';
+                const dot = val === null ? 'bg-zinc-500' : val >= 90 ? 'bg-emerald-500' : val >= 50 ? 'bg-amber-500' : 'bg-rose-500';
                 return `
-                  <div class="card-tactile p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="text-xs font-mono font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)]">${label}</span>
-                      <span class="px-2 py-0.5 rounded-[4px] border text-xs font-mono font-bold ${scoreBadgeClass(val)}">
-                        ${val ?? '—'}
-                      </span>
-                    </div>
-                    <div class="w-full h-2 rounded-full bg-[var(--bg-surface)] overflow-hidden">
-                      <div class="h-full ${barColor}" style="width: ${val ?? 0}%;"></div>
-                    </div>
+                  <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-[6px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] font-mono text-xs">
+                    <span class="flex items-center gap-2 text-[var(--text-secondary)]">
+                      <span class="w-2 h-2 rounded-full ${dot} shrink-0"></span>
+                      <span>${label}</span>
+                    </span>
+                    <span class="font-bold text-[var(--text-primary)]">${val ?? '—'}</span>
                   </div>
                 `;
               })
@@ -551,12 +762,12 @@ import '../styles/global.css';
               errorEl.textContent = err instanceof Error ? err.message : 'Unable to complete audit.';
               errorEl.classList.remove('hidden');
             }
+            previewEl?.classList.remove('hidden');
           } finally {
             setLoading(false);
           }
         });
 
-        // Copy Markdown Report (includes both Mobile & Desktop)
         document.getElementById('copy-md-btn')?.addEventListener('click', async (e) => {
           if (!fullPayload) return;
           const formatBlock = (label, d) => {
@@ -580,11 +791,10 @@ import '../styles/global.css';
           const btn = e.currentTarget;
           btn.textContent = 'Copied!';
           setTimeout(() => {
-            btn.textContent = 'Copy Markdown';
+            btn.textContent = 'Copy MD';
           }, 1800);
         });
 
-        // Download JSON Report
         document.getElementById('download-json-btn')?.addEventListener('click', () => {
           if (!fullPayload) return;
           const blob = new Blob([JSON.stringify(fullPayload, null, 2)], { type: 'application/json' });

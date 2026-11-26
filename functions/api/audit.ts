@@ -227,11 +227,23 @@ async function runPsiScan(
     return a.score - b.score;
   });
 
+  const totalBytes =
+    typeof audits['total-byte-weight']?.numericValue === 'number'
+      ? Math.round(audits['total-byte-weight'].numericValue / 1024)
+      : null;
+  const requestCount = Array.isArray(audits['network-requests']?.details?.items)
+    ? audits['network-requests'].details.items.length
+    : null;
+
   return {
     auditedUrl: psi.id ?? targetUrl.toString(),
     finalUrl: lhr.finalDisplayedUrl ?? lhr.finalUrl ?? targetUrl.toString(),
     strategy,
     fetchTime: lhr.fetchTime ?? new Date().toISOString(),
+    payload: {
+      totalKb: totalBytes,
+      requestCount,
+    },
     scores: {
       performance: toScore(categories.performance),
       accessibility: toScore(categories.accessibility),
