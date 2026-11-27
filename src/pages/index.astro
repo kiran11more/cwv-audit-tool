@@ -837,6 +837,110 @@ import '../styles/global.css';
           });
         });
 
+        function normalizePsiClient(psi, strat) {
+          const lhr = psi.lighthouseResult || {};
+          const categories = lhr.categories || {};
+          const audits = lhr.audits || {};
+          const loadingExp = psi.loadingExperience || {};
+          const fieldMetrics = loadingExp.metrics || {};
+
+          const toScore = (cat) => (typeof cat?.score === 'number' ? Math.round(cat.score * 100) : null);
+          const extractLab = (id) => {
+            const a = audits[id];
+            if (!a) return null;
+            return {
+              id,
+              title: a.title || id,
+              displayValue: a.displayValue || '—',
+              numericValue: typeof a.numericValue === 'number' ? a.numericValue : null,
+              score: typeof a.score === 'number' ? a.score : null,
+            };
+          };
+          const extractField = (key, unit) => {
+            const m = fieldMetrics[key];
+            if (!m || typeof m.percentile !== 'number') return null;
+            const p = m.percentile;
+            const displayValue =
+              unit === 'cls' ? (p / 100).toFixed(2) : p >= 1000 ? `${(p / 1000).toFixed(2)} s` : `${p} ms`;
+            return { percentile: p, displayValue, category: m.category || 'NONE' };
+          };
+
+          const opportunities = [];
+          for (const [id, audit] of Object.entries(audits)) {
+            if (!audit || typeof audit.score !== 'number' || audit.score >= 0.9) continue;
+            const details = audit.details;
+            if (
+              details?.type === 'opportunity' ||
+              (typeof details?.overallSavingsMs === 'number' && details.overallSavingsMs > 0) ||
+              (typeof details?.overallSavingsBytes === 'number' && details.overallSavingsBytes > 0)
+            ) {
+              opportunities.push({
+                id,
+                title: audit.title || id,
+                description: String(audit.description || '').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1').trim(),
+                displayValue: audit.displayValue || '',
+                savingsMs: Math.round(details?.overallSavingsMs || 0),
+                savingsBytes: Math.round(details?.overallSavingsBytes || 0),
+                score: audit.score,
+              });
+            }
+          }
+          opportunities.sort((a, b) => b.savingsMs - a.savingsMs || b.savingsBytes - a.savingsBytes || a.score - b.score);
+
+          return {
+            auditedUrl: psi.id || lhr.finalUrl,
+            finalUrl: lhr.finalDisplayedUrl || lhr.finalUrl || psi.id,
+            strategy: strat,
+            fetchTime: lhr.fetchTime || new Date().toISOString(),
+            payload: {
+              totalKb: typeof audits['total-byte-weight']?.numericValue === 'number'
+                ? Math.round(audits['total-byte-weight'].numericValue / 1024)
+                : null,
+              requestCount: Array.isArray(audits['network-requests']?.details?.items)
+                ? audits['network-requests'].details.items.length
+                : null,
+            },
+            scores: {
+              performance: toScore(categories.performance),
+              accessibility: toScore(categories.accessibility),
+              bestPractices: toScore(categories['best-practices']),
+              seo: toScore(categories.seo),
+            },
+            fieldData: {
+              overallCategory: loadingExp.overall_category || null,
+              hasData: Object.keys(fieldMetrics).length > 0,
+              lcp: extractField('LARGEST_CONTENTFUL_PAINT_MS', 'ms'),
+              inp: extractField('INTERACTION_TO_NEXT_PAINT', 'ms'),
+              cls: extractField('CUMULATIVE_LAYOUT_SHIFT_SCORE', 'cls'),
+              fcp: extractField('FIRST_CONTENTFUL_PAINT_MS', 'ms'),
+              ttfb: extractField('EXPERIMENTAL_TIME_TO_FIRST_BYTE', 'ms'),
+            },
+            labData: {
+              lcp: extractLab('largest-contentful-paint'),
+              tbt: extractLab('total-blocking-time'),
+              cls: extractLab('cumulative-layout-shift'),
+              fcp: extractLab('first-contentful-paint'),
+              si: extractLab('speed-index'),
+              ttfb: extractLab('server-response-time'),
+            },
+            opportunities: opportunities.slice(0, 8),
+          };
+        }
+
+        async function fetchDirectPsiFallback(targetUrl, strat) {
+          const normalized = /^https?:\/\//i.test(targetUrl) ? targetUrl : `https://${targetUrl}`;
+          const psiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
+          psiUrl.searchParams.set('url', normalized);
+          psiUrl.searchParams.set('strategy', strat);
+          psiUrl.searchParams.set('category', 'performance');
+          const res = await fetch(psiUrl.toString(), { signal: AbortSignal.timeout(60_000) });
+          if (!res.ok) {
+            throw new Error(`Timed out scanning ${strat} (target site responded too slowly). Please try again.`);
+          }
+          const psi = await res.json();
+          return normalizePsiClient(psi, strat);
+        }
+
         async function fetchSingleStrategy(targetUrl, strat) {
           const res = await fetch('/api/audit', {
             method: 'POST',
@@ -848,12 +952,16 @@ import '../styles/global.css';
           try {
             data = JSON.parse(rawText);
           } catch {
-            throw new Error(
-              res.status === 524 || res.status === 504 || rawText.trim().startsWith('<')
-                ? `Timed out scanning ${strat} (target site responded too slowly). Please try again.`
-                : `Unexpected server response (${res.status}) while scanning ${strat}.`,
-            );
+            data = null;
           }
+
+          if (res.status === 504 || res.status === 524 || (!data && rawText.trim().startsWith('<'))) {
+            if (loadingStage) {
+              loadingStage.textContent = `Slow target site detected — running extended ${strat} scan...`;
+            }
+            return await fetchDirectPsiFallback(targetUrl, strat);
+          }
+
           if (!res.ok) {
             throw new Error(data?.error || `Request failed (${res.status})`);
           }
