@@ -613,8 +613,18 @@ import '../styles/global.css';
           const desktopScore = fullPayload?.desktop?.scores?.performance;
           const mBadge = document.getElementById('tab-mobile-score');
           const dBadge = document.getElementById('tab-desktop-score');
-          if (mBadge) mBadge.textContent = mobileScore ?? 'N/A';
-          if (dBadge) dBadge.textContent = desktopScore ?? 'N/A';
+          if (mBadge) {
+            mBadge.textContent = mobileScore ?? 'N/A';
+            mBadge.className = activeView === 'mobile'
+              ? 'px-1.5 py-0.5 rounded-[4px] bg-black/15 text-[#111111] text-[10px]'
+              : 'px-1.5 py-0.5 rounded-[4px] bg-[var(--bg-canvas)] text-[var(--text-primary)] text-[10px]';
+          }
+          if (dBadge) {
+            dBadge.textContent = desktopScore ?? 'N/A';
+            dBadge.className = activeView === 'desktop'
+              ? 'px-1.5 py-0.5 rounded-[4px] bg-black/15 text-[#111111] text-[10px]'
+              : 'px-1.5 py-0.5 rounded-[4px] bg-[var(--bg-canvas)] text-[var(--text-primary)] text-[10px]';
+          }
 
           document.querySelectorAll('.view-tab').forEach((tab) => {
             const view = tab.getAttribute('data-view');
